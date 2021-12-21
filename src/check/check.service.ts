@@ -131,16 +131,34 @@ export class CheckService {
         isQuote: false,
       });
 
-      if (closeOffer && +closeOffer.efPrice >= +openOffer.efPrice) {
-        await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
-          offers: [closeOffer],
-        });
+      if (closeOffer) {
+        const canClose = this.canClose(+openOffer.efPrice, +closeOffer.efPrice);
+        if (canClose) {
+          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+            offers: [closeOffer],
+          });
 
-        return closeOffer;
+          return closeOffer;
+        }
       }
     } catch (e) {
       this.logger.error(e);
     }
+  }
+
+  private canClose(openEfPrice: number, closeEfPrice: number) {
+    if (closeEfPrice >= openEfPrice)
+      return this.config.app.takeProfit
+        ? this.percent(openEfPrice, closeEfPrice) >= this.config.app.takeProfit
+        : true;
+
+    return this.config.app.stopLoss
+      ? this.percent(closeEfPrice, openEfPrice) <= this.config.app.stopLoss
+      : false;
+  }
+
+  private percent(value1: number, value2: number) {
+    return (value2 / value1 - 1) * 100;
   }
 
   private notify(trade, event: TradeEvent) {
