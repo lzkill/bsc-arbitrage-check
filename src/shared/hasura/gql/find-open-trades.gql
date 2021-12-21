@@ -1,0 +1,40 @@
+query findOpenTrades {
+  biscoint_trade(where: {type: {_eq: "arbitrage"}, status: {_eq: "open"}}) {
+    closeOffer {
+      apiKeyId
+      base
+      baseAmount
+      confirmedAt
+      createdAt
+      efPrice
+      expiresAt
+      id
+      isQuote
+      offerId
+      op
+      quote
+      quoteAmount
+    }
+    id
+    checkedAt
+    openOffer {
+      apiKeyId
+      base
+      baseAmount
+      confirmedAt
+      createdAt
+      efPrice
+      expiresAt
+      id
+      isQuote
+      offerId
+      op
+      quote
+      quoteAmount
+    }
+    owner
+    status
+    strategy
+    type
+  }
+}

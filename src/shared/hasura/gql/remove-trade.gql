@@ -1,0 +1,11 @@
+mutation removeTrade($tradeId: Int!, $openOfferId: Int!, $closeOfferId: Int!, $id: Int = 10) {
+  removeTrade: delete_biscoint_trade_by_pk(id: $tradeId) {
+    id
+  }
+  removeOpenOffer: delete_biscoint_offer_by_pk(id: $openOfferId) {
+    id
+  }
+  removeCloseOffer: delete_biscoint_offer_by_pk(id: $closeOfferId) {
+    id
+  }
+}
