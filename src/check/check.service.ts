@@ -8,6 +8,7 @@ import {
 import { AppConfigService } from 'src/config/config.service';
 import { BrokerService } from 'src/shared/broker/broker.service';
 import { AppLoggerService } from 'src/shared/logger/logger.service';
+import { BackOffPolicy, Retryable } from 'typescript-retry-decorator';
 import { RateLimitedBiscointService } from './rate-limited/biscoint.service';
 import { RateLimitedHasuraService } from './rate-limited/hasura.service';
 
@@ -60,7 +61,7 @@ export class CheckService {
   async checkOpenTrades() {
     try {
       const openTrades = await this.hasura.findOpenTrades();
-      if (openTrades.length) {
+      if (openTrades?.length) {
         const lastTrades = await this.biscoint.getTrades(
           this.config.app.historySize,
         );
@@ -77,7 +78,7 @@ export class CheckService {
 
           const isZombieTrade = !openTrade && this.isExpired(trade.openOffer);
           if (isZombieTrade) {
-            this.hasura.removeTrade(trade);
+            this.removeTrade(trade);
             continue;
           }
 
@@ -87,7 +88,7 @@ export class CheckService {
             const closeOffer = await this.closeTrade(trade);
             if (closeOffer) {
               Object.assign(trade.closeOffer, closeOffer);
-              this.hasura.updateOffer(trade.closeOffer);
+              this.updateOffer(trade.closeOffer);
             }
 
             if (!trade.checkedAt) this.notify(trade, TradeEvent.TRADE_BROKEN);
@@ -97,10 +98,10 @@ export class CheckService {
           const isClosedTrade = openTrade && closeTrade;
           if (isClosedTrade) {
             trade.openOffer.confirmedAt = openTrade.date;
-            this.hasura.updateOffer(trade.openOffer);
+            this.updateOffer(trade.openOffer);
 
             trade.closeOffer.confirmedAt = closeTrade.date;
-            this.hasura.updateOffer(trade.closeOffer);
+            this.updateOffer(trade.closeOffer);
 
             trade.status = 'closed';
             this.notify(trade, TradeEvent.TRADE_CLOSED);
@@ -172,9 +173,43 @@ export class CheckService {
     }
   }
 
+  @Retryable({
+    maxAttempts: 10,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 5000, multiplier: 2 },
+  })
+  private updateOffer(offer) {
+    try {
+      return this.hasura.updateOffer(offer);
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  @Retryable({
+    maxAttempts: 10,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 5000, multiplier: 2 },
+  })
   private updateTrade(trade) {
     try {
-      this.hasura.updateTrade(trade);
+      return this.hasura.updateTrade(trade);
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  @Retryable({
+    maxAttempts: 10,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 5000, multiplier: 2 },
+  })
+  private removeTrade(trade) {
+    try {
+      return this.hasura.removeTrade(trade);
     } catch (e) {
       this.logger.error(e);
     }
