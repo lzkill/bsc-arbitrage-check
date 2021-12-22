@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RateLimitedBiscointService } from './check/rate-limited/biscoint.service';
 import { CheckService } from './check/check.service';
-import { TelegramService } from './check/telegram.service';
+import { RateLimitedBiscointService } from './check/rate-limited/biscoint.service';
+import { TelegramService } from './check/rate-limited/telegram.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
