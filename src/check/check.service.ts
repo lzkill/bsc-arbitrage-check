@@ -166,7 +166,7 @@ export class CheckService {
     try {
       this.broker.publish(RABBITMQ_BISCOINT_NOTIFY_KEY, {
         event: event,
-        trade: trade,
+        payload: trade,
       });
     } catch (e) {
       this.logger.error(e);
