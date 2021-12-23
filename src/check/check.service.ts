@@ -78,7 +78,7 @@ export class CheckService {
 
           const isZombieTrade =
             !openTrade &&
-            this.isExpired(trade.openOffer, this.config.app.removeAfter);
+            this.isExpired(trade.openOffer, this.config.app.expireAfter);
           if (isZombieTrade) {
             this.removeTrade(trade);
             continue;

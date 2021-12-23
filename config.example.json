@@ -2,8 +2,7 @@
   "app": {
     "name": "bsc-arbitrage-check",
     "checkInterval": 60000,
-    "expireAfter": 60000,
-    "removeAfter": 300000,
+    "expireAfter": 180000,
     "historySize": 100,
     "takeProfit": 0.1,
     "stopLoss": 0.05,
