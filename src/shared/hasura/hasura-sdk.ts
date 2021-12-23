@@ -1487,7 +1487,7 @@ export type UpdateTradeMutation = {
 export const FindOpenTradesDocument = gql`
   query findOpenTrades {
     biscoint_trade(
-      where: { type: { _eq: "arbitrage" }, status: { _eq: "open" } }
+      where: { type: { _eq: "arbitrage" }, status: { _in: ["open", "broken"] } }
     ) {
       closeOffer {
         apiKeyId

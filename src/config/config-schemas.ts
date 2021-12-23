@@ -6,6 +6,8 @@ export const positiveIntegerSchema = joi.number().positive().precision(0);
 export const appSchema = joi.object({
   name: joi.string().required(),
   checkInterval: positiveIntegerSchema.default(60000),
+  expireAfter: positiveIntegerSchema.default(60000),
+  removeAfter: positiveIntegerSchema.default(300000),
   historySize: positiveIntegerSchema.default(100),
   takeProfit: positiveDecimalSchema.default(0),
   stopLoss: positiveDecimalSchema.default(0),
@@ -43,6 +45,8 @@ export const telegramSchema = joi.object({
 export interface AppConfig {
   name: string;
   checkInterval: number;
+  expireAfter: number;
+  removeAfter: number;
   historySize: number;
   takeProfit: number;
   stopLoss: number;

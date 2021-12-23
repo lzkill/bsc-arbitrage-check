@@ -76,14 +76,18 @@ export class CheckService {
             (t: ITradesResult) => t.offerId === trade.closeOffer.offerId,
           );
 
-          const isZombieTrade = !openTrade && this.isExpired(trade.openOffer);
+          const isZombieTrade =
+            !openTrade &&
+            this.isExpired(trade.openOffer, this.config.app.removeAfter);
           if (isZombieTrade) {
             this.removeTrade(trade);
             continue;
           }
 
           const isBrokenTrade =
-            openTrade && !closeTrade && this.isExpired(trade.closeOffer);
+            openTrade &&
+            !closeTrade &&
+            this.isExpired(trade.closeOffer, this.config.app.expireAfter);
           if (isBrokenTrade) {
             const closeOffer = await this.closeTrade(trade);
             if (closeOffer) {
@@ -91,18 +95,18 @@ export class CheckService {
               this.updateOffer(trade.closeOffer);
             }
 
-            if (!trade.checkedAt) this.notify(trade, TradeEvent.TRADE_BROKEN);
-            continue;
+            if (trade.status !== 'broken') {
+              trade.status = 'broken';
+              this.notify(trade, TradeEvent.TRADE_BROKEN);
+            }
           }
 
           const isClosedTrade = openTrade && closeTrade;
           if (isClosedTrade) {
             trade.openOffer.confirmedAt = openTrade.date;
             this.updateOffer(trade.openOffer);
-
             trade.closeOffer.confirmedAt = closeTrade.date;
             this.updateOffer(trade.closeOffer);
-
             trade.status = 'closed';
             this.notify(trade, TradeEvent.TRADE_CLOSED);
           }
@@ -116,10 +120,10 @@ export class CheckService {
     }
   }
 
-  private isExpired(offer) {
+  private isExpired(offer, expireAfter = 0) {
     const expiresAt = new Date(offer.expiresAt).getTime();
     const now = Date.now();
-    return expiresAt <= now;
+    return now - expiresAt > expireAfter;
   }
 
   private async closeTrade(trade) {
@@ -162,17 +166,6 @@ export class CheckService {
     return (value2 / value1 - 1) * 100;
   }
 
-  private notify(trade, event: TradeEvent) {
-    try {
-      this.broker.publish(RABBITMQ_BISCOINT_NOTIFY_KEY, {
-        event: event,
-        payload: trade,
-      });
-    } catch (e) {
-      this.logger.error(e);
-    }
-  }
-
   @Retryable({
     maxAttempts: 10,
     backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
@@ -210,6 +203,17 @@ export class CheckService {
   private removeTrade(trade) {
     try {
       return this.hasura.removeTrade(trade);
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  private notify(trade, event: TradeEvent) {
+    try {
+      this.broker.publish(RABBITMQ_BISCOINT_NOTIFY_KEY, {
+        event: event,
+        payload: trade,
+      });
     } catch (e) {
       this.logger.error(e);
     }
