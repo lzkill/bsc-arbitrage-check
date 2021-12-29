@@ -65,6 +65,9 @@ export class CheckService {
         const lastTrades = await this.biscoint.getTrades(
           this.config.app.historySize,
         );
+        const zombieTrades = [];
+        const brokenTrades = [];
+        const closedTrades = [];
         for (const trade of openTrades) {
           const openTrade = _.find(
             lastTrades,
@@ -80,7 +83,7 @@ export class CheckService {
             !openTrade &&
             this.isExpired(trade.openOffer, this.config.app.expireAfter);
           if (isZombieTrade) {
-            this.removeTrade(trade);
+            zombieTrades.push(trade);
             continue;
           }
 
@@ -89,31 +92,21 @@ export class CheckService {
             !closeTrade &&
             this.isExpired(trade.closeOffer, this.config.app.expireAfter);
           if (isBrokenTrade) {
-            const closeOffer = await this.closeTrade(trade);
-            if (closeOffer) {
-              Object.assign(trade.closeOffer, closeOffer);
-              this.updateOffer(trade.closeOffer);
-            }
-
-            if (trade.status !== 'broken') {
-              trade.status = 'broken';
-              this.notify(trade, TradeEvent.TRADE_BROKEN);
-            }
+            brokenTrades.push(trade);
+            continue;
           }
 
           const isClosedTrade = openTrade && closeTrade;
           if (isClosedTrade) {
             trade.openOffer.confirmedAt = openTrade.date;
-            this.updateOffer(trade.openOffer);
             trade.closeOffer.confirmedAt = closeTrade.date;
-            this.updateOffer(trade.closeOffer);
-            trade.status = 'closed';
-            this.notify(trade, TradeEvent.TRADE_CLOSED);
+            closedTrades.push(trade);
           }
-
-          trade.checkedAt = moment.utc();
-          this.updateTrade(trade);
         }
+
+        this.handleZombieTrades(zombieTrades);
+        this.handleBrokenTrades(brokenTrades);
+        this.handleClosedTrades(closedTrades);
       }
     } catch (e) {
       this.logger.error(e);
@@ -126,44 +119,110 @@ export class CheckService {
     return now - expiresAt > expireAfter;
   }
 
-  private async closeTrade(trade) {
+  private handleZombieTrades(trades: any[]) {
     try {
-      const openOffer = trade.openOffer;
-      const closeOffer = await this.biscoint.getOffer({
-        base: openOffer.base,
-        amount: openOffer.baseAmount,
-        op: 'sell',
-        isQuote: false,
-      });
-
-      if (closeOffer) {
-        const canClose = this.canClose(+openOffer.efPrice, +closeOffer.efPrice);
-        if (canClose) {
-          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
-            offers: [closeOffer],
-          });
-
-          return closeOffer;
-        }
+      for (const trade of trades) {
+        this.removeTrade(trade);
       }
     } catch (e) {
       this.logger.error(e);
     }
   }
 
-  private canClose(openEfPrice: number, closeEfPrice: number) {
-    if (closeEfPrice >= openEfPrice)
+  private async handleBrokenTrades(trades: any[]) {
+    try {
+      const breakEvenEfPrice = this.getBreakEvenEfPrice(trades);
+      const offers = [];
+      for (const trade of trades) {
+        if (trade.status !== 'broken') {
+          trade.status = 'broken';
+          this.notify(trade, TradeEvent.TRADE_BROKEN);
+        }
+
+        const closeOffer = await this.biscoint.getOffer({
+          base: trade.openOffer.base,
+          amount: trade.openOffer.baseAmount,
+          op: 'sell',
+          isQuote: false,
+        });
+
+        if (closeOffer) {
+          const canClose = this.canClose(+closeOffer.efPrice, breakEvenEfPrice);
+          if (canClose) {
+            offers.push(closeOffer);
+            Object.assign(trade.closeOffer, closeOffer);
+            this.updateOffer(trade.closeOffer);
+          }
+        }
+
+        trade.checkedAt = moment.utc();
+        this.updateTrade(trade);
+      }
+
+      if (offers.length)
+        this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+          offers: offers,
+        });
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  private getBreakEvenEfPrice(trades) {
+    const totalQuoteAmount = trades
+      .map((trade) => +trade.quoteAmount)
+      .reduce((a, b) => a + b);
+    const totalBaseAmount = trades
+      .map((trade) => +trade.baseAmount)
+      .reduce((a, b) => a + b);
+    return totalQuoteAmount / totalBaseAmount;
+  }
+
+  private canClose(closeEfPrice: number, breakEvenPrice: number) {
+    if (closeEfPrice >= breakEvenPrice)
       return this.config.app.takeProfit
-        ? this.percent(openEfPrice, closeEfPrice) >= this.config.app.takeProfit
+        ? this.percent(breakEvenPrice, closeEfPrice) >=
+            this.config.app.takeProfit
         : true;
 
     return this.config.app.stopLoss
-      ? this.percent(closeEfPrice, openEfPrice) <= this.config.app.stopLoss
+      ? this.percent(closeEfPrice, breakEvenPrice) <= this.config.app.stopLoss
       : false;
   }
 
   private percent(value1: number, value2: number) {
     return (value2 / value1 - 1) * 100;
+  }
+
+  private async handleClosedTrades(trades: any[]) {
+    try {
+      for (const trade of trades) {
+        this.notify(trade, TradeEvent.TRADE_CLOSED);
+
+        this.updateOffer(trade.openOffer);
+        this.updateOffer(trade.closeOffer);
+
+        trade.status = 'closed';
+        trade.checkedAt = moment.utc();
+        this.updateTrade(trade);
+      }
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  @Retryable({
+    maxAttempts: 10,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 5000, multiplier: 2 },
+  })
+  private removeTrade(trade) {
+    try {
+      return this.hasura.removeTrade(trade);
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   @Retryable({
@@ -189,20 +248,6 @@ export class CheckService {
   private updateTrade(trade) {
     try {
       return this.hasura.updateTrade(trade);
-    } catch (e) {
-      this.logger.error(e);
-    }
-  }
-
-  @Retryable({
-    maxAttempts: 10,
-    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
-    backOff: 1000,
-    exponentialOption: { maxInterval: 5000, multiplier: 2 },
-  })
-  private removeTrade(trade) {
-    try {
-      return this.hasura.removeTrade(trade);
     } catch (e) {
       this.logger.error(e);
     }
