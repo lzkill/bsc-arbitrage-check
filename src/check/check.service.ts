@@ -61,10 +61,10 @@ export class CheckService {
       const pendingTrades = await this.hasura.findPendingTrades();
       if (pendingTrades?.length) {
         const brokenTrades = pendingTrades.filter((t) => t.status === 'broken');
-        await this.handleBrokenTrades(brokenTrades);
+        if (brokenTrades?.length) await this.handleBrokenTrades(brokenTrades);
 
         const openTrades = pendingTrades.filter((t) => t.status === 'open');
-        await this.handleOpenTrades(openTrades);
+        if (openTrades?.length) await this.handleOpenTrades(openTrades);
       }
     } catch (e) {
       this.logger.error(e);
