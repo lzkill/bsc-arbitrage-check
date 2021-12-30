@@ -51,7 +51,7 @@ export class RateLimitedBiscointService {
     });
   }
 
-  async getTrades(n: number) {
+  async getConfirmedOffers(n: number) {
     const length = 20;
     const pages = Math.ceil(n / length);
 

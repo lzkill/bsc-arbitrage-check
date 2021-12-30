@@ -62,51 +62,51 @@ export class CheckService {
     try {
       const openTrades = await this.hasura.findOpenTrades();
       if (openTrades?.length) {
-        const lastTrades = await this.biscoint.getTrades(
+        const confirmedOffers = await this.biscoint.getConfirmedOffers(
           this.config.app.historySize,
         );
-        const zombieTrades = [];
+        const missedTrades = [];
         const brokenTrades = [];
         const closedTrades = [];
         for (const trade of openTrades) {
-          const openTrade = _.find(
-            lastTrades,
+          const openOffer = _.find(
+            confirmedOffers,
             (t: ITradesResult) => t.offerId === trade.openOffer.offerId,
           );
 
-          const closeTrade = _.find(
-            lastTrades,
+          const closeOffer = _.find(
+            confirmedOffers,
             (t: ITradesResult) => t.offerId === trade.closeOffer.offerId,
           );
 
-          const isZombieTrade =
-            !openTrade &&
+          const isMissedTrade =
+            !openOffer &&
             this.isExpired(trade.openOffer, this.config.app.expireAfter);
-          if (isZombieTrade) {
-            zombieTrades.push(trade);
+          if (isMissedTrade) {
+            missedTrades.push(trade);
             continue;
           }
 
           const isBrokenTrade =
-            openTrade &&
-            !closeTrade &&
+            openOffer &&
+            !closeOffer &&
             this.isExpired(trade.closeOffer, this.config.app.expireAfter);
           if (isBrokenTrade) {
             brokenTrades.push(trade);
             continue;
           }
 
-          const isClosedTrade = openTrade && closeTrade;
+          const isClosedTrade = openOffer && closeOffer;
           if (isClosedTrade) {
-            trade.openOffer.confirmedAt = openTrade.date;
-            trade.closeOffer.confirmedAt = closeTrade.date;
+            trade.openOffer.confirmedAt = openOffer.date;
+            trade.closeOffer.confirmedAt = closeOffer.date;
             closedTrades.push(trade);
           }
         }
 
-        this.handleZombieTrades(zombieTrades);
+        await this.handleMissedTrades(missedTrades);
         await this.handleBrokenTrades(brokenTrades);
-        this.handleClosedTrades(closedTrades);
+        await this.handleClosedTrades(closedTrades);
       }
     } catch (e) {
       this.logger.error(e);
@@ -119,74 +119,77 @@ export class CheckService {
     return now - expiresAt > expireAfter;
   }
 
-  private handleZombieTrades(trades: any[]) {
+  private async handleMissedTrades(trades: any[]) {
     try {
       for (const trade of trades) {
-        this.removeTrade(trade);
+        if (trade.status !== 'broken') {
+          trade.status = 'missed';
+          trade.checkedAt = moment.utc();
+          await this.updateTrade(trade);
+        }
       }
     } catch (e) {
       this.logger.error(e);
     }
   }
 
+  // single sell on avg efPrice
   private async handleBrokenTrades(trades: any[]) {
     try {
-      const breakEvenEfPrice = this.getBreakEvenEfPrice(trades);
-      const offers = [];
-      for (const trade of trades) {
-        if (trade.status !== 'broken') {
-          trade.status = 'broken';
-          this.notify(trade, TradeEvent.TRADE_BROKEN);
-        }
+      const baseGroups = _.groupBy(trades, 'openOffer.base');
+
+      for (const [base, baseTrades] of Object.entries(baseGroups)) {
+        const totalQuoteAmount = baseTrades
+          .map((trade) => +trade.openOffer.quoteAmount)
+          .reduce((a, b) => a + b);
+        const totalBaseAmount = baseTrades
+          .map((trade) => +trade.openOffer.baseAmount)
+          .reduce((a, b) => a + b);
+        const breakEvenEfPrice = totalQuoteAmount / totalBaseAmount;
 
         const closeOffer = await this.biscoint.getOffer({
-          base: trade.openOffer.base,
-          amount: trade.openOffer.baseAmount,
+          base: base,
+          amount: totalBaseAmount.toString(),
           op: 'sell',
           isQuote: false,
         });
 
-        if (closeOffer) {
-          const canClose = this.canClose(+closeOffer.efPrice, breakEvenEfPrice);
-          if (canClose) {
-            offers.push(closeOffer);
+        const canClose = this.canClose(breakEvenEfPrice, +closeOffer.efPrice);
+        if (canClose) {
+          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+            offers: [closeOffer],
+          });
+
+          for (const trade of baseTrades) {
+            let mustNotify = false;
+            if (trade.status !== 'broken') {
+              trade.status = 'broken';
+              mustNotify = true;
+            }
+
             Object.assign(trade.closeOffer, closeOffer);
-            this.updateOffer(trade.closeOffer);
+            await this.updateOffer(trade.closeOffer);
+
+            trade.checkedAt = moment.utc();
+            await this.updateTrade(trade);
+
+            if (mustNotify) this.notify(trade, TradeEvent.TRADE_BROKEN);
           }
         }
-
-        trade.checkedAt = moment.utc();
-        this.updateTrade(trade);
       }
-
-      if (offers.length)
-        await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
-          offers: offers,
-        });
     } catch (e) {
       this.logger.error(e);
     }
   }
 
-  private getBreakEvenEfPrice(trades) {
-    const totalQuoteAmount = trades
-      .map((trade) => +trade.quoteAmount)
-      .reduce((a, b) => a + b);
-    const totalBaseAmount = trades
-      .map((trade) => +trade.baseAmount)
-      .reduce((a, b) => a + b);
-    return totalQuoteAmount / totalBaseAmount;
-  }
-
-  private canClose(closeEfPrice: number, breakEvenPrice: number) {
-    if (closeEfPrice >= breakEvenPrice)
+  private canClose(openEfPrice: number, closeEfPrice: number) {
+    if (closeEfPrice >= openEfPrice)
       return this.config.app.takeProfit
-        ? this.percent(breakEvenPrice, closeEfPrice) >=
-            this.config.app.takeProfit
+        ? this.percent(openEfPrice, closeEfPrice) >= this.config.app.takeProfit
         : true;
 
     return this.config.app.stopLoss
-      ? this.percent(closeEfPrice, breakEvenPrice) <= this.config.app.stopLoss
+      ? this.percent(closeEfPrice, openEfPrice) <= this.config.app.stopLoss
       : false;
   }
 
@@ -197,14 +200,13 @@ export class CheckService {
   private async handleClosedTrades(trades: any[]) {
     try {
       for (const trade of trades) {
-        this.notify(trade, TradeEvent.TRADE_CLOSED);
-
-        this.updateOffer(trade.openOffer);
-        this.updateOffer(trade.closeOffer);
-
         trade.status = 'closed';
         trade.checkedAt = moment.utc();
-        this.updateTrade(trade);
+        await this.updateTrade(trade);
+        await this.updateOffer(trade.openOffer);
+        await this.updateOffer(trade.closeOffer);
+
+        this.notify(trade, TradeEvent.TRADE_CLOSED);
       }
     } catch (e) {
       this.logger.error(e);
@@ -255,7 +257,7 @@ export class CheckService {
 
   private notify(trade, event: TradeEvent) {
     try {
-      this.broker.publish(RABBITMQ_BISCOINT_NOTIFY_KEY, {
+      return this.broker.publish(RABBITMQ_BISCOINT_NOTIFY_KEY, {
         event: event,
         payload: trade,
       });
