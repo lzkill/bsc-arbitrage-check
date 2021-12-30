@@ -105,7 +105,7 @@ export class CheckService {
         }
 
         this.handleZombieTrades(zombieTrades);
-        this.handleBrokenTrades(brokenTrades);
+        await this.handleBrokenTrades(brokenTrades);
         this.handleClosedTrades(closedTrades);
       }
     } catch (e) {
@@ -160,7 +160,7 @@ export class CheckService {
       }
 
       if (offers.length)
-        this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+        await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
           offers: offers,
         });
     } catch (e) {
