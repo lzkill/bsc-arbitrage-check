@@ -1,5 +1,5 @@
-mutation updateTrade($id: Int!, $checkedAt: timestamptz, $status: String) {
-  update_biscoint_trade_by_pk(pk_columns: {id: $id}, _set: {checkedAt: $checkedAt, status: $status}) {
+mutation updateTrade($id: Int!, $checkedAt: timestamptz, $status: String, $hasSiblings: Boolean) {
+  update_biscoint_trade_by_pk(pk_columns: {id: $id}, _set: {checkedAt: $checkedAt, status: $status, hasSiblings: $hasSiblings}) {
     id
   }
 }

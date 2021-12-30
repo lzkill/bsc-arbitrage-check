@@ -98,6 +98,7 @@ export class CheckService {
             Object.assign(trade.closeOffer, closeOffer);
             await this.updateOffer(trade.closeOffer);
 
+            trade.hasSiblings = baseTrades.length > 1 ? true : false;
             trade.checkedAt = moment.utc();
             await this.updateTrade(trade);
           }
