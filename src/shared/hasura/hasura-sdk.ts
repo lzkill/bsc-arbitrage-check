@@ -402,6 +402,217 @@ export interface BiscointOfferVarianceFields {
   id?: Maybe<Scalars['Float']>;
 }
 
+/** columns and relationships of "biscoint.open_trade" */
+export interface BiscointOpenTrade {
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  checkedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  isQuote?: Maybe<Scalars['Boolean']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  owner?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
+  strategy?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+}
+
+/** aggregated selection of "biscoint.open_trade" */
+export interface BiscointOpenTradeAggregate {
+  aggregate?: Maybe<BiscointOpenTradeAggregateFields>;
+  nodes: Array<BiscointOpenTrade>;
+}
+
+/** aggregate fields of "biscoint.open_trade" */
+export interface BiscointOpenTradeAggregateFields {
+  avg?: Maybe<BiscointOpenTradeAvgFields>;
+  count: Scalars['Int'];
+  max?: Maybe<BiscointOpenTradeMaxFields>;
+  min?: Maybe<BiscointOpenTradeMinFields>;
+  stddev?: Maybe<BiscointOpenTradeStddevFields>;
+  stddev_pop?: Maybe<BiscointOpenTradeStddevPopFields>;
+  stddev_samp?: Maybe<BiscointOpenTradeStddevSampFields>;
+  sum?: Maybe<BiscointOpenTradeSumFields>;
+  var_pop?: Maybe<BiscointOpenTradeVarPopFields>;
+  var_samp?: Maybe<BiscointOpenTradeVarSampFields>;
+  variance?: Maybe<BiscointOpenTradeVarianceFields>;
+}
+
+/** aggregate fields of "biscoint.open_trade" */
+export interface BiscointOpenTradeAggregateFieldsCountArgs {
+  columns?: InputMaybe<Array<BiscointOpenTradeSelectColumn>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+}
+
+/** aggregate avg on columns */
+export interface BiscointOpenTradeAvgFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** Boolean expression to filter rows from the table "biscoint.open_trade". All fields are combined with a logical 'AND'. */
+export interface BiscointOpenTradeBoolExp {
+  _and?: InputMaybe<Array<BiscointOpenTradeBoolExp>>;
+  _not?: InputMaybe<BiscointOpenTradeBoolExp>;
+  _or?: InputMaybe<Array<BiscointOpenTradeBoolExp>>;
+  apiKeyId?: InputMaybe<StringComparisonExp>;
+  base?: InputMaybe<StringComparisonExp>;
+  baseAmount?: InputMaybe<StringComparisonExp>;
+  checkedAt?: InputMaybe<TimestamptzComparisonExp>;
+  createdAt?: InputMaybe<TimestamptzComparisonExp>;
+  efPrice?: InputMaybe<StringComparisonExp>;
+  expiresAt?: InputMaybe<TimestamptzComparisonExp>;
+  id?: InputMaybe<IntComparisonExp>;
+  isQuote?: InputMaybe<BooleanComparisonExp>;
+  offerId?: InputMaybe<StringComparisonExp>;
+  op?: InputMaybe<StringComparisonExp>;
+  owner?: InputMaybe<StringComparisonExp>;
+  quote?: InputMaybe<StringComparisonExp>;
+  quoteAmount?: InputMaybe<StringComparisonExp>;
+  status?: InputMaybe<StringComparisonExp>;
+  strategy?: InputMaybe<StringComparisonExp>;
+  type?: InputMaybe<StringComparisonExp>;
+}
+
+/** aggregate max on columns */
+export interface BiscointOpenTradeMaxFields {
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  checkedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  owner?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
+  strategy?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+}
+
+/** aggregate min on columns */
+export interface BiscointOpenTradeMinFields {
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  checkedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  owner?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
+  strategy?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+}
+
+/** Ordering options when selecting data from "biscoint.open_trade". */
+export interface BiscointOpenTradeOrderBy {
+  apiKeyId?: InputMaybe<OrderBy>;
+  base?: InputMaybe<OrderBy>;
+  baseAmount?: InputMaybe<OrderBy>;
+  checkedAt?: InputMaybe<OrderBy>;
+  createdAt?: InputMaybe<OrderBy>;
+  efPrice?: InputMaybe<OrderBy>;
+  expiresAt?: InputMaybe<OrderBy>;
+  id?: InputMaybe<OrderBy>;
+  isQuote?: InputMaybe<OrderBy>;
+  offerId?: InputMaybe<OrderBy>;
+  op?: InputMaybe<OrderBy>;
+  owner?: InputMaybe<OrderBy>;
+  quote?: InputMaybe<OrderBy>;
+  quoteAmount?: InputMaybe<OrderBy>;
+  status?: InputMaybe<OrderBy>;
+  strategy?: InputMaybe<OrderBy>;
+  type?: InputMaybe<OrderBy>;
+}
+
+/** select columns of table "biscoint.open_trade" */
+export enum BiscointOpenTradeSelectColumn {
+  /** column name */
+  ApiKeyId = 'apiKeyId',
+  /** column name */
+  Base = 'base',
+  /** column name */
+  BaseAmount = 'baseAmount',
+  /** column name */
+  CheckedAt = 'checkedAt',
+  /** column name */
+  CreatedAt = 'createdAt',
+  /** column name */
+  EfPrice = 'efPrice',
+  /** column name */
+  ExpiresAt = 'expiresAt',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsQuote = 'isQuote',
+  /** column name */
+  OfferId = 'offerId',
+  /** column name */
+  Op = 'op',
+  /** column name */
+  Owner = 'owner',
+  /** column name */
+  Quote = 'quote',
+  /** column name */
+  QuoteAmount = 'quoteAmount',
+  /** column name */
+  Status = 'status',
+  /** column name */
+  Strategy = 'strategy',
+  /** column name */
+  Type = 'type',
+}
+
+/** aggregate stddev on columns */
+export interface BiscointOpenTradeStddevFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_pop on columns */
+export interface BiscointOpenTradeStddevPopFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_samp on columns */
+export interface BiscointOpenTradeStddevSampFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate sum on columns */
+export interface BiscointOpenTradeSumFields {
+  id?: Maybe<Scalars['Int']>;
+}
+
+/** aggregate var_pop on columns */
+export interface BiscointOpenTradeVarPopFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate var_samp on columns */
+export interface BiscointOpenTradeVarSampFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate variance on columns */
+export interface BiscointOpenTradeVarianceFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
 /** columns and relationships of "biscoint.order" */
 export interface BiscointOrder {
   amount: Scalars['String'];
@@ -1225,6 +1436,10 @@ export interface QueryRoot {
   biscoint_offer_aggregate: BiscointOfferAggregate;
   /** fetch data from the table: "biscoint.offer" using primary key columns */
   biscoint_offer_by_pk?: Maybe<BiscointOffer>;
+  /** fetch data from the table: "biscoint.open_trade" */
+  biscoint_open_trade: Array<BiscointOpenTrade>;
+  /** fetch aggregated fields from the table: "biscoint.open_trade" */
+  biscoint_open_trade_aggregate: BiscointOpenTradeAggregate;
   /** fetch data from the table: "biscoint.order" */
   biscoint_order: Array<BiscointOrder>;
   /** fetch aggregated fields from the table: "biscoint.order" */
@@ -1261,6 +1476,22 @@ export interface QueryRootBiscointOfferAggregateArgs {
 
 export interface QueryRootBiscointOfferByPkArgs {
   id: Scalars['Int'];
+}
+
+export interface QueryRootBiscointOpenTradeArgs {
+  distinct_on?: InputMaybe<Array<BiscointOpenTradeSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointOpenTradeOrderBy>>;
+  where?: InputMaybe<BiscointOpenTradeBoolExp>;
+}
+
+export interface QueryRootBiscointOpenTradeAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointOpenTradeSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointOpenTradeOrderBy>>;
+  where?: InputMaybe<BiscointOpenTradeBoolExp>;
 }
 
 export interface QueryRootBiscointOrderArgs {
@@ -1326,6 +1557,10 @@ export interface SubscriptionRoot {
   biscoint_offer_aggregate: BiscointOfferAggregate;
   /** fetch data from the table: "biscoint.offer" using primary key columns */
   biscoint_offer_by_pk?: Maybe<BiscointOffer>;
+  /** fetch data from the table: "biscoint.open_trade" */
+  biscoint_open_trade: Array<BiscointOpenTrade>;
+  /** fetch aggregated fields from the table: "biscoint.open_trade" */
+  biscoint_open_trade_aggregate: BiscointOpenTradeAggregate;
   /** fetch data from the table: "biscoint.order" */
   biscoint_order: Array<BiscointOrder>;
   /** fetch aggregated fields from the table: "biscoint.order" */
@@ -1362,6 +1597,22 @@ export interface SubscriptionRootBiscointOfferAggregateArgs {
 
 export interface SubscriptionRootBiscointOfferByPkArgs {
   id: Scalars['Int'];
+}
+
+export interface SubscriptionRootBiscointOpenTradeArgs {
+  distinct_on?: InputMaybe<Array<BiscointOpenTradeSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointOpenTradeOrderBy>>;
+  where?: InputMaybe<BiscointOpenTradeBoolExp>;
+}
+
+export interface SubscriptionRootBiscointOpenTradeAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointOpenTradeSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointOpenTradeOrderBy>>;
+  where?: InputMaybe<BiscointOpenTradeBoolExp>;
 }
 
 export interface SubscriptionRootBiscointOrderArgs {
@@ -1433,9 +1684,9 @@ export interface TimestamptzComparisonExp {
   _nin?: InputMaybe<Array<Scalars['timestamptz']>>;
 }
 
-export type FindOpenTradesQueryVariables = Exact<{ [key: string]: never }>;
+export type FindPendingTradesQueryVariables = Exact<{ [key: string]: never }>;
 
-export type FindOpenTradesQuery = {
+export type FindPendingTradesQuery = {
   biscoint_trade: Array<{
     id: number;
     checkedAt?: Date | null | undefined;
@@ -1479,19 +1730,6 @@ export type FindOpenTradesQuery = {
   }>;
 };
 
-export type RemoveTradeMutationVariables = Exact<{
-  tradeId: Scalars['Int'];
-  openOfferId: Scalars['Int'];
-  closeOfferId: Scalars['Int'];
-  id?: InputMaybe<Scalars['Int']>;
-}>;
-
-export type RemoveTradeMutation = {
-  removeTrade?: { id: number } | null | undefined;
-  removeOpenOffer?: { id: number } | null | undefined;
-  removeCloseOffer?: { id: number } | null | undefined;
-};
-
 export type UpdateOfferMutationVariables = Exact<{
   id: Scalars['Int'];
   apiKeyId?: InputMaybe<Scalars['String']>;
@@ -1517,8 +1755,8 @@ export type UpdateTradeMutation = {
   update_biscoint_trade_by_pk?: { id: number } | null | undefined;
 };
 
-export const FindOpenTradesDocument = gql`
-  query findOpenTrades {
+export const FindPendingTradesDocument = gql`
+  query findPendingTrades {
     biscoint_trade(
       where: { type: { _eq: "arbitrage" }, status: { _in: ["open", "broken"] } }
     ) {
@@ -1558,24 +1796,6 @@ export const FindOpenTradesDocument = gql`
       status
       strategy
       type
-    }
-  }
-`;
-export const RemoveTradeDocument = gql`
-  mutation removeTrade(
-    $tradeId: Int!
-    $openOfferId: Int!
-    $closeOfferId: Int!
-    $id: Int = 10
-  ) {
-    removeTrade: delete_biscoint_trade_by_pk(id: $tradeId) {
-      id
-    }
-    removeOpenOffer: delete_biscoint_offer_by_pk(id: $openOfferId) {
-      id
-    }
-    removeCloseOffer: delete_biscoint_offer_by_pk(id: $closeOfferId) {
-      id
     }
   }
 `;
@@ -1629,31 +1849,18 @@ export function getSdk(
   withWrapper: SdkFunctionWrapper = defaultWrapper,
 ) {
   return {
-    findOpenTrades(
-      variables?: FindOpenTradesQueryVariables,
+    findPendingTrades(
+      variables?: FindPendingTradesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers'],
-    ): Promise<FindOpenTradesQuery> {
+    ): Promise<FindPendingTradesQuery> {
       return withWrapper(
         (wrappedRequestHeaders) =>
-          client.request<FindOpenTradesQuery>(
-            FindOpenTradesDocument,
+          client.request<FindPendingTradesQuery>(
+            FindPendingTradesDocument,
             variables,
             { ...requestHeaders, ...wrappedRequestHeaders },
           ),
-        'findOpenTrades',
-      );
-    },
-    removeTrade(
-      variables: RemoveTradeMutationVariables,
-      requestHeaders?: Dom.RequestInit['headers'],
-    ): Promise<RemoveTradeMutation> {
-      return withWrapper(
-        (wrappedRequestHeaders) =>
-          client.request<RemoveTradeMutation>(RemoveTradeDocument, variables, {
-            ...requestHeaders,
-            ...wrappedRequestHeaders,
-          }),
-        'removeTrade',
+        'findPendingTrades',
       );
     },
     updateOffer(

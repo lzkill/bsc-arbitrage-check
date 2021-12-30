@@ -3,9 +3,9 @@
     "name": "bsc-arbitrage-check",
     "checkInterval": 60000,
     "expireAfter": 180000,
-    "historySize": 100,
-    "takeProfit": 0.1,
-    "stopLoss": 0.05,
+    "historySize": 120,
+    "takeProfit": 0,
+    "stopLoss": 0,
     "enabled": true
   },
   "biscoint": {

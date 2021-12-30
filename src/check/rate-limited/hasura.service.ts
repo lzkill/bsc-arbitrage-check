@@ -31,8 +31,8 @@ export class RateLimitedHasuraService {
     });
   }
 
-  async findOpenTrades() {
-    return (await this.limiter.schedule(() => this.hasura.findOpenTrades()))
+  async findPendingTrades() {
+    return (await this.limiter.schedule(() => this.hasura.findPendingTrades()))
       .biscoint_trade;
   }
 
@@ -42,9 +42,5 @@ export class RateLimitedHasuraService {
 
   updateTrade(trade) {
     return this.limiter.schedule(() => this.hasura.updateTrade(trade));
-  }
-
-  removeTrade(trade) {
-    return this.limiter.schedule(() => this.hasura.removeTrade(trade));
   }
 }

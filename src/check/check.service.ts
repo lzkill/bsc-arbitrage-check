@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ITradesResult } from 'biscoint-api-node/dist/typings/biscoint';
 import * as _ from 'lodash';
 import {
   RABBITMQ_BISCOINT_CONFIRM_KEY,
@@ -15,7 +14,6 @@ import { RateLimitedHasuraService } from './rate-limited/hasura.service';
 const moment = require('moment');
 
 enum TradeEvent {
-  TRADE_OPEN = 'trade-open',
   TRADE_BROKEN = 'trade-broken',
   TRADE_CLOSED = 'trade-closed',
 }
@@ -37,7 +35,7 @@ export class CheckService {
       if (this.config.app.enabled) {
         const startedAt = Date.now();
 
-        await this.checkOpenTrades();
+        await this.checkPendingTrades();
         this.cycleCount += 1;
 
         const finishedAt = Date.now();
@@ -58,75 +56,15 @@ export class CheckService {
     }
   }
 
-  async checkOpenTrades() {
+  private async checkPendingTrades() {
     try {
-      const openTrades = await this.hasura.findOpenTrades();
-      if (openTrades?.length) {
-        const confirmedOffers = await this.biscoint.getConfirmedOffers(
-          this.config.app.historySize,
-        );
-        const missedTrades = [];
-        const brokenTrades = [];
-        const closedTrades = [];
-        for (const trade of openTrades) {
-          const openOffer = _.find(
-            confirmedOffers,
-            (t: ITradesResult) => t.offerId === trade.openOffer.offerId,
-          );
-
-          const closeOffer = _.find(
-            confirmedOffers,
-            (t: ITradesResult) => t.offerId === trade.closeOffer.offerId,
-          );
-
-          const isMissedTrade =
-            !openOffer &&
-            this.isExpired(trade.openOffer, this.config.app.expireAfter);
-          if (isMissedTrade) {
-            missedTrades.push(trade);
-            continue;
-          }
-
-          const isBrokenTrade =
-            openOffer &&
-            !closeOffer &&
-            this.isExpired(trade.closeOffer, this.config.app.expireAfter);
-          if (isBrokenTrade) {
-            brokenTrades.push(trade);
-            continue;
-          }
-
-          const isClosedTrade = openOffer && closeOffer;
-          if (isClosedTrade) {
-            trade.openOffer.confirmedAt = openOffer.date;
-            trade.closeOffer.confirmedAt = closeOffer.date;
-            closedTrades.push(trade);
-          }
-        }
-
-        await this.handleMissedTrades(missedTrades);
+      const pendingTrades = await this.hasura.findPendingTrades();
+      if (pendingTrades?.length) {
+        const brokenTrades = pendingTrades.filter((t) => t.status === 'broken');
         await this.handleBrokenTrades(brokenTrades);
-        await this.handleClosedTrades(closedTrades);
-      }
-    } catch (e) {
-      this.logger.error(e);
-    }
-  }
 
-  private isExpired(offer, expireAfter = 0) {
-    const expiresAt = new Date(offer.expiresAt).getTime();
-    const now = Date.now();
-    return now - expiresAt > expireAfter;
-  }
-
-  private async handleMissedTrades(trades: any[]) {
-    try {
-      for (const trade of trades) {
-        if (trade.status !== 'broken') {
-          trade.status = 'missed';
-          trade.checkedAt = moment.utc();
-          await this.updateTrade(trade);
-        }
+        const openTrades = pendingTrades.filter((t) => t.status === 'open');
+        await this.handleOpenTrades(openTrades);
       }
     } catch (e) {
       this.logger.error(e);
@@ -156,25 +94,17 @@ export class CheckService {
 
         const canClose = this.canClose(breakEvenEfPrice, +closeOffer.efPrice);
         if (canClose) {
-          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
-            offers: [closeOffer],
-          });
-
           for (const trade of baseTrades) {
-            let mustNotify = false;
-            if (trade.status !== 'broken') {
-              trade.status = 'broken';
-              mustNotify = true;
-            }
-
             Object.assign(trade.closeOffer, closeOffer);
             await this.updateOffer(trade.closeOffer);
 
             trade.checkedAt = moment.utc();
             await this.updateTrade(trade);
-
-            if (mustNotify) this.notify(trade, TradeEvent.TRADE_BROKEN);
           }
+
+          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+            offers: [closeOffer],
+          });
         }
       }
     } catch (e) {
@@ -197,34 +127,56 @@ export class CheckService {
     return (value2 / value1 - 1) * 100;
   }
 
-  private async handleClosedTrades(trades: any[]) {
+  private async handleOpenTrades(trades: any[]) {
     try {
+      const confirmedOffers = await this.biscoint.getConfirmedOffers(
+        this.config.app.historySize,
+      );
+
       for (const trade of trades) {
-        trade.status = 'closed';
+        const openOffer = confirmedOffers.get(trade.openOffer.offerId);
+        const closeOffer = confirmedOffers.get(trade.closeOffer.offerId);
+
+        const isMissedTrade =
+          !openOffer &&
+          this.isExpired(trade.openOffer, this.config.app.expireAfter);
+        if (isMissedTrade) {
+          trade.status = 'missed';
+        }
+
+        const isBrokenTrade =
+          openOffer &&
+          !closeOffer &&
+          this.isExpired(trade.closeOffer, this.config.app.expireAfter);
+        if (isBrokenTrade) {
+          trade.status = 'broken';
+          this.notify(trade, TradeEvent.TRADE_BROKEN);
+        }
+
+        const isClosedTrade = openOffer && closeOffer;
+        if (isClosedTrade) {
+          trade.openOffer.confirmedAt = openOffer.date;
+          await this.updateOffer(trade.openOffer);
+
+          trade.closeOffer.confirmedAt = closeOffer.date;
+          await this.updateOffer(trade.closeOffer);
+
+          trade.status = 'closed';
+          this.notify(trade, TradeEvent.TRADE_CLOSED);
+        }
+
         trade.checkedAt = moment.utc();
         await this.updateTrade(trade);
-        await this.updateOffer(trade.openOffer);
-        await this.updateOffer(trade.closeOffer);
-
-        this.notify(trade, TradeEvent.TRADE_CLOSED);
       }
     } catch (e) {
       this.logger.error(e);
     }
   }
 
-  @Retryable({
-    maxAttempts: 10,
-    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
-    backOff: 1000,
-    exponentialOption: { maxInterval: 5000, multiplier: 2 },
-  })
-  private removeTrade(trade) {
-    try {
-      return this.hasura.removeTrade(trade);
-    } catch (e) {
-      this.logger.error(e);
-    }
+  private isExpired(offer, expireAfter = 0) {
+    const expiresAt = new Date(offer.expiresAt).getTime();
+    const now = Date.now();
+    return now - expiresAt > expireAfter;
   }
 
   @Retryable({

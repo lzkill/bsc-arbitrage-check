@@ -1,4 +1,4 @@
-query findOpenTrades {
+query findPendingTrades {
   biscoint_trade(where: {type: {_eq: "arbitrage"}, status: {_in: ["open", "broken"]}}) {
     closeOffer {
       apiKeyId

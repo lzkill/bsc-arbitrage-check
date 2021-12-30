@@ -3,6 +3,7 @@ import {
   IMetaResult,
   IOfferParams,
   IPaginatedTradesResult,
+  ITradesResult,
 } from 'biscoint-api-node/dist/typings/biscoint';
 import Bottleneck from 'bottleneck';
 import { BiscointService } from 'src/shared/biscoint/biscoint.service';
@@ -65,7 +66,8 @@ export class RateLimitedBiscointService {
       )) as IPaginatedTradesResult;
       trades.push(...t.trades);
     }
-    return trades;
+
+    return new Map(trades.map((obj: ITradesResult) => [obj.offerId, obj]));
   }
 
   getOffer(args: IOfferParams) {

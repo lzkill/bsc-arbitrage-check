@@ -15,8 +15,8 @@ export class HasuraService {
     });
   }
 
-  async findOpenTrades() {
-    return getSdk(this.client).findOpenTrades();
+  async findPendingTrades() {
+    return getSdk(this.client).findPendingTrades();
   }
 
   async updateOffer(offer) {
@@ -47,14 +47,5 @@ export class HasuraService {
     const { id, checkedAt, status } = trade;
     const variables = { id, checkedAt, status };
     return getSdk(this.client).updateTrade(variables);
-  }
-
-  async removeTrade(trade) {
-    const variables = {
-      tradeId: trade.id,
-      openOfferId: trade.openOffer.id,
-      closeOfferId: trade.closeOffer.id,
-    };
-    return getSdk(this.client).removeTrade(variables);
   }
 }

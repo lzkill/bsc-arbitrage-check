@@ -7,7 +7,7 @@ export const appSchema = joi.object({
   name: joi.string().required(),
   checkInterval: positiveIntegerSchema.default(60000),
   expireAfter: positiveIntegerSchema.default(180000),
-  historySize: positiveIntegerSchema.default(100),
+  historySize: positiveIntegerSchema.default(120),
   takeProfit: positiveDecimalSchema.default(0),
   stopLoss: positiveDecimalSchema.default(0),
   enabled: joi.boolean().default(true),
