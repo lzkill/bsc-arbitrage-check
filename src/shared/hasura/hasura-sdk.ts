@@ -90,6 +90,7 @@ export interface BiscointMissedTrade {
   createdAt?: Maybe<Scalars['timestamptz']>;
   efPrice?: Maybe<Scalars['String']>;
   expiresAt?: Maybe<Scalars['timestamptz']>;
+  hasSiblings?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['Int']>;
   isQuote?: Maybe<Scalars['Boolean']>;
   offerId?: Maybe<Scalars['String']>;
@@ -146,6 +147,7 @@ export interface BiscointMissedTradeBoolExp {
   createdAt?: InputMaybe<TimestamptzComparisonExp>;
   efPrice?: InputMaybe<StringComparisonExp>;
   expiresAt?: InputMaybe<TimestamptzComparisonExp>;
+  hasSiblings?: InputMaybe<BooleanComparisonExp>;
   id?: InputMaybe<IntComparisonExp>;
   isQuote?: InputMaybe<BooleanComparisonExp>;
   offerId?: InputMaybe<StringComparisonExp>;
@@ -207,6 +209,7 @@ export interface BiscointMissedTradeOrderBy {
   createdAt?: InputMaybe<OrderBy>;
   efPrice?: InputMaybe<OrderBy>;
   expiresAt?: InputMaybe<OrderBy>;
+  hasSiblings?: InputMaybe<OrderBy>;
   id?: InputMaybe<OrderBy>;
   isQuote?: InputMaybe<OrderBy>;
   offerId?: InputMaybe<OrderBy>;
@@ -235,6 +238,8 @@ export enum BiscointMissedTradeSelectColumn {
   EfPrice = 'efPrice',
   /** column name */
   ExpiresAt = 'expiresAt',
+  /** column name */
+  HasSiblings = 'hasSiblings',
   /** column name */
   Id = 'id',
   /** column name */
@@ -891,6 +896,7 @@ export interface BiscointPendingTrade {
   createdAt?: Maybe<Scalars['timestamptz']>;
   efPrice?: Maybe<Scalars['String']>;
   expiresAt?: Maybe<Scalars['timestamptz']>;
+  hasSiblings?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['Int']>;
   isQuote?: Maybe<Scalars['Boolean']>;
   offerId?: Maybe<Scalars['String']>;
@@ -947,6 +953,7 @@ export interface BiscointPendingTradeBoolExp {
   createdAt?: InputMaybe<TimestamptzComparisonExp>;
   efPrice?: InputMaybe<StringComparisonExp>;
   expiresAt?: InputMaybe<TimestamptzComparisonExp>;
+  hasSiblings?: InputMaybe<BooleanComparisonExp>;
   id?: InputMaybe<IntComparisonExp>;
   isQuote?: InputMaybe<BooleanComparisonExp>;
   offerId?: InputMaybe<StringComparisonExp>;
@@ -1008,6 +1015,7 @@ export interface BiscointPendingTradeOrderBy {
   createdAt?: InputMaybe<OrderBy>;
   efPrice?: InputMaybe<OrderBy>;
   expiresAt?: InputMaybe<OrderBy>;
+  hasSiblings?: InputMaybe<OrderBy>;
   id?: InputMaybe<OrderBy>;
   isQuote?: InputMaybe<OrderBy>;
   offerId?: InputMaybe<OrderBy>;
@@ -1036,6 +1044,8 @@ export enum BiscointPendingTradeSelectColumn {
   EfPrice = 'efPrice',
   /** column name */
   ExpiresAt = 'expiresAt',
+  /** column name */
+  HasSiblings = 'hasSiblings',
   /** column name */
   Id = 'id',
   /** column name */
@@ -1843,6 +1853,7 @@ export type UpdateTradeMutationVariables = Exact<{
   id: Scalars['Int'];
   checkedAt?: InputMaybe<Scalars['timestamptz']>;
   status?: InputMaybe<Scalars['String']>;
+  hasSiblings?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 export type UpdateTradeMutation = {
@@ -1922,10 +1933,19 @@ export const UpdateOfferDocument = gql`
   }
 `;
 export const UpdateTradeDocument = gql`
-  mutation updateTrade($id: Int!, $checkedAt: timestamptz, $status: String) {
+  mutation updateTrade(
+    $id: Int!
+    $checkedAt: timestamptz
+    $status: String
+    $hasSiblings: Boolean
+  ) {
     update_biscoint_trade_by_pk(
       pk_columns: { id: $id }
-      _set: { checkedAt: $checkedAt, status: $status }
+      _set: {
+        checkedAt: $checkedAt
+        status: $status
+        hasSiblings: $hasSiblings
+      }
     ) {
       id
     }
