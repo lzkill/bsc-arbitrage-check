@@ -689,7 +689,7 @@ export interface BiscointOrderBoolExp {
 /** unique or primary key constraints on table "biscoint.order" */
 export enum BiscointOrderConstraint {
   /** unique or primary key constraint */
-  SchedulePkey = 'schedule_pkey',
+  OrderPkey = 'order_pkey',
 }
 
 /** input type for incrementing numeric columns in table "biscoint.order" */
@@ -1787,6 +1787,14 @@ export interface TimestamptzComparisonExp {
   _nin?: InputMaybe<Array<Scalars['timestamptz']>>;
 }
 
+export type CreateOfferMutationVariables = Exact<{
+  input: BiscointOfferInsertInput;
+}>;
+
+export type CreateOfferMutation = {
+  insert_biscoint_offer_one?: { id: number } | null | undefined;
+};
+
 export type FindPendingTradesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type FindPendingTradesQuery = {
@@ -1798,6 +1806,8 @@ export type FindPendingTradesQuery = {
     strategy?: string | null | undefined;
     type?: string | null | undefined;
     hasSiblings?: boolean | null | undefined;
+    openOfferId: number;
+    closeOfferId?: number | null | undefined;
     closeOffer?:
       | {
           apiKeyId: string;
@@ -1860,6 +1870,13 @@ export type UpdateTradeMutation = {
   update_biscoint_trade_by_pk?: { id: number } | null | undefined;
 };
 
+export const CreateOfferDocument = gql`
+  mutation createOffer($input: biscoint_offer_insert_input!) {
+    insert_biscoint_offer_one(object: $input) {
+      id
+    }
+  }
+`;
 export const FindPendingTradesDocument = gql`
   query findPendingTrades {
     biscoint_trade(
@@ -1902,6 +1919,8 @@ export const FindPendingTradesDocument = gql`
       strategy
       type
       hasSiblings
+      openOfferId
+      closeOfferId
     }
   }
 `;
@@ -1964,6 +1983,19 @@ export function getSdk(
   withWrapper: SdkFunctionWrapper = defaultWrapper,
 ) {
   return {
+    createOffer(
+      variables: CreateOfferMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers'],
+    ): Promise<CreateOfferMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<CreateOfferMutation>(CreateOfferDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'createOffer',
+      );
+    },
     findPendingTrades(
       variables?: FindPendingTradesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers'],

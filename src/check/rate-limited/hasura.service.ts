@@ -36,6 +36,11 @@ export class RateLimitedHasuraService {
       .biscoint_trade;
   }
 
+  async createOffer(offer) {
+    return (await this.limiter.schedule(() => this.hasura.createOffer(offer)))
+      .insert_biscoint_offer_one.id;
+  }
+
   updateOffer(offer) {
     return this.limiter.schedule(() => this.hasura.updateOffer(offer));
   }

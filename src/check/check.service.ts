@@ -94,9 +94,10 @@ export class CheckService {
 
         const canClose = this.canClose(breakEvenEfPrice, +closeOffer.efPrice);
         if (canClose) {
+          const closeOfferId = await this.createOffer(closeOffer);
+
           for (const trade of baseTrades) {
-            Object.assign(trade.closeOffer, closeOffer);
-            await this.updateOffer(trade.closeOffer);
+            trade.closeOfferId = closeOfferId;
 
             trade.hasSiblings = baseTrades.length > 1 ? true : false;
             trade.checkedAt = moment.utc();
@@ -178,6 +179,20 @@ export class CheckService {
     const expiresAt = new Date(offer.expiresAt).getTime();
     const now = Date.now();
     return now - expiresAt > expireAfter;
+  }
+
+  @Retryable({
+    maxAttempts: 10,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 5000, multiplier: 2 },
+  })
+  private createOffer(offer) {
+    try {
+      return this.hasura.createOffer(offer);
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   @Retryable({

@@ -43,6 +43,12 @@ export class HasuraService {
     return getSdk(this.client).updateOffer(variables);
   }
 
+  async createOffer(offer) {
+    return getSdk(this.client).createOffer({
+      input: offer,
+    });
+  }
+
   async updateTrade(trade) {
     const { id, checkedAt, status, hasSiblings } = trade;
     const variables = { id, checkedAt, status, hasSiblings };
