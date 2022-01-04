@@ -60,15 +60,66 @@ export class CheckService {
     try {
       const pendingTrades = await this.hasura.findPendingTrades();
       if (pendingTrades?.length) {
+        await this.handlePendingTrades(pendingTrades);
+
         const brokenTrades = pendingTrades.filter((t) => t.status === 'broken');
         if (brokenTrades?.length) await this.handleBrokenTrades(brokenTrades);
-
-        const openTrades = pendingTrades.filter((t) => t.status === 'open');
-        if (openTrades?.length) await this.handleOpenTrades(openTrades);
       }
     } catch (e) {
       this.logger.error(e);
     }
+  }
+
+  private async handlePendingTrades(trades: any[]) {
+    try {
+      const confirmedOffers = await this.biscoint.getConfirmedOffers(
+        this.config.app.historySize,
+      );
+
+      for (const trade of trades) {
+        const openOffer = confirmedOffers.get(trade.openOffer.offerId);
+        const closeOffer = confirmedOffers.get(trade.closeOffer.offerId);
+
+        const isMissedTrade =
+          !openOffer &&
+          this.isExpired(trade.openOffer, this.config.app.expireAfter);
+        if (isMissedTrade) {
+          trade.status = 'missed';
+        }
+
+        const isBrokenTrade =
+          openOffer &&
+          !closeOffer &&
+          this.isExpired(trade.closeOffer, this.config.app.expireAfter);
+        if (isBrokenTrade) {
+          trade.status = 'broken';
+          this.notify(trade, TradeEvent.TRADE_BROKEN);
+        }
+
+        const isClosedTrade = openOffer && closeOffer;
+        if (isClosedTrade) {
+          trade.openOffer.confirmedAt = openOffer.date;
+          await this.updateOffer(trade.openOffer);
+
+          trade.closeOffer.confirmedAt = closeOffer.date;
+          await this.updateOffer(trade.closeOffer);
+
+          trade.status = 'closed';
+          this.notify(trade, TradeEvent.TRADE_CLOSED);
+        }
+
+        trade.checkedAt = moment.utc();
+        await this.updateTrade(trade);
+      }
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  private isExpired(offer, expireAfter = 0) {
+    const expiresAt = new Date(offer.expiresAt).getTime();
+    const now = Date.now();
+    return now - expiresAt > expireAfter;
   }
 
   // single sell on avg efPrice
@@ -128,58 +179,6 @@ export class CheckService {
 
   private percent(value1: number, value2: number) {
     return (value2 / value1 - 1) * 100;
-  }
-
-  private async handleOpenTrades(trades: any[]) {
-    try {
-      const confirmedOffers = await this.biscoint.getConfirmedOffers(
-        this.config.app.historySize,
-      );
-
-      for (const trade of trades) {
-        const openOffer = confirmedOffers.get(trade.openOffer.offerId);
-        const closeOffer = confirmedOffers.get(trade.closeOffer.offerId);
-
-        const isMissedTrade =
-          !openOffer &&
-          this.isExpired(trade.openOffer, this.config.app.expireAfter);
-        if (isMissedTrade) {
-          trade.status = 'missed';
-        }
-
-        const isBrokenTrade =
-          openOffer &&
-          !closeOffer &&
-          this.isExpired(trade.closeOffer, this.config.app.expireAfter);
-        if (isBrokenTrade) {
-          trade.status = 'broken';
-          this.notify(trade, TradeEvent.TRADE_BROKEN);
-        }
-
-        const isClosedTrade = openOffer && closeOffer;
-        if (isClosedTrade) {
-          trade.openOffer.confirmedAt = openOffer.date;
-          await this.updateOffer(trade.openOffer);
-
-          trade.closeOffer.confirmedAt = closeOffer.date;
-          await this.updateOffer(trade.closeOffer);
-
-          trade.status = 'closed';
-          this.notify(trade, TradeEvent.TRADE_CLOSED);
-        }
-
-        trade.checkedAt = moment.utc();
-        await this.updateTrade(trade);
-      }
-    } catch (e) {
-      this.logger.error(e);
-    }
-  }
-
-  private isExpired(offer, expireAfter = 0) {
-    const expiresAt = new Date(offer.expiresAt).getTime();
-    const now = Date.now();
-    return now - expiresAt > expireAfter;
   }
 
   @Retryable({
