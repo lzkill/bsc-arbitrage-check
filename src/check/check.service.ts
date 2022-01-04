@@ -102,9 +102,12 @@ export class CheckService {
           for (const trade of baseTrades) {
             trade.closeOfferId = closeOfferId;
             trade.hasSiblings = baseTrades.length > 1 ? true : false;
-            trade.checkedAt = moment.utc();
-            await this.updateTrade(trade);
           }
+        }
+
+        for (const trade of baseTrades) {
+          trade.checkedAt = moment.utc();
+          await this.updateTrade(trade);
         }
       }
     } catch (e) {
