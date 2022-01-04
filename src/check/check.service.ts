@@ -94,19 +94,17 @@ export class CheckService {
 
         const canClose = this.canClose(breakEvenEfPrice, +closeOffer.efPrice);
         if (canClose) {
-          const closeOfferId = await this.createOffer(closeOffer);
+          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
+            offers: [closeOffer],
+          });
 
+          const closeOfferId = await this.createOffer(closeOffer);
           for (const trade of baseTrades) {
             trade.closeOfferId = closeOfferId;
-
             trade.hasSiblings = baseTrades.length > 1 ? true : false;
             trade.checkedAt = moment.utc();
             await this.updateTrade(trade);
           }
-
-          await this.broker.publish(RABBITMQ_BISCOINT_CONFIRM_KEY, {
-            offers: [closeOffer],
-          });
         }
       }
     } catch (e) {
