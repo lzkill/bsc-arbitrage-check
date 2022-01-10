@@ -32,13 +32,17 @@ export class RateLimitedHasuraService {
   }
 
   async findPendingTrades() {
-    return (await this.limiter.schedule(() => this.hasura.findPendingTrades()))
-      .biscoint_trade;
+    const trades = await this.limiter.schedule(() =>
+      this.hasura.findPendingTrades(),
+    );
+    return trades.biscoint_trade;
   }
 
   async createOffer(offer) {
-    return (await this.limiter.schedule(() => this.hasura.createOffer(offer)))
-      .insert_biscoint_offer_one.id;
+    const _offer = await this.limiter.schedule(() =>
+      this.hasura.createOffer(offer),
+    );
+    return _offer.insert_biscoint_offer_one.id;
   }
 
   updateOffer(offer) {
