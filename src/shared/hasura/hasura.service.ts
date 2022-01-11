@@ -50,8 +50,8 @@ export class HasuraService {
   }
 
   async updateTrade(trade) {
-    const { id, checkedAt, status, hasSiblings } = trade;
-    const variables = { id, checkedAt, status, hasSiblings };
+    const { id, checkedAt, status, hasSiblings, closeOfferId } = trade;
+    const variables = { id, checkedAt, status, hasSiblings, closeOfferId };
     return getSdk(this.client).updateTrade(variables);
   }
 }

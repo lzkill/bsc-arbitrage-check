@@ -19,6 +19,7 @@ export interface Scalars {
   Boolean: boolean;
   Int: number;
   Float: number;
+  numeric: any;
   timestamptz: Date;
 }
 
@@ -81,23 +82,115 @@ export interface StringComparisonExp {
   _similar?: InputMaybe<Scalars['String']>;
 }
 
+/** columns and relationships of "biscoint.missed_profit" */
+export interface BiscointMissedProfit {
+  quoteProfit?: Maybe<Scalars['numeric']>;
+}
+
+/** aggregated selection of "biscoint.missed_profit" */
+export interface BiscointMissedProfitAggregate {
+  aggregate?: Maybe<BiscointMissedProfitAggregateFields>;
+  nodes: Array<BiscointMissedProfit>;
+}
+
+/** aggregate fields of "biscoint.missed_profit" */
+export interface BiscointMissedProfitAggregateFields {
+  avg?: Maybe<BiscointMissedProfitAvgFields>;
+  count: Scalars['Int'];
+  max?: Maybe<BiscointMissedProfitMaxFields>;
+  min?: Maybe<BiscointMissedProfitMinFields>;
+  stddev?: Maybe<BiscointMissedProfitStddevFields>;
+  stddev_pop?: Maybe<BiscointMissedProfitStddevPopFields>;
+  stddev_samp?: Maybe<BiscointMissedProfitStddevSampFields>;
+  sum?: Maybe<BiscointMissedProfitSumFields>;
+  var_pop?: Maybe<BiscointMissedProfitVarPopFields>;
+  var_samp?: Maybe<BiscointMissedProfitVarSampFields>;
+  variance?: Maybe<BiscointMissedProfitVarianceFields>;
+}
+
+/** aggregate fields of "biscoint.missed_profit" */
+export interface BiscointMissedProfitAggregateFieldsCountArgs {
+  columns?: InputMaybe<Array<BiscointMissedProfitSelectColumn>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+}
+
+/** aggregate avg on columns */
+export interface BiscointMissedProfitAvgFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** Boolean expression to filter rows from the table "biscoint.missed_profit". All fields are combined with a logical 'AND'. */
+export interface BiscointMissedProfitBoolExp {
+  _and?: InputMaybe<Array<BiscointMissedProfitBoolExp>>;
+  _not?: InputMaybe<BiscointMissedProfitBoolExp>;
+  _or?: InputMaybe<Array<BiscointMissedProfitBoolExp>>;
+  quoteProfit?: InputMaybe<NumericComparisonExp>;
+}
+
+/** aggregate max on columns */
+export interface BiscointMissedProfitMaxFields {
+  quoteProfit?: Maybe<Scalars['numeric']>;
+}
+
+/** aggregate min on columns */
+export interface BiscointMissedProfitMinFields {
+  quoteProfit?: Maybe<Scalars['numeric']>;
+}
+
+/** Ordering options when selecting data from "biscoint.missed_profit". */
+export interface BiscointMissedProfitOrderBy {
+  quoteProfit?: InputMaybe<OrderBy>;
+}
+
+/** select columns of table "biscoint.missed_profit" */
+export enum BiscointMissedProfitSelectColumn {
+  /** column name */
+  QuoteProfit = 'quoteProfit',
+}
+
+/** aggregate stddev on columns */
+export interface BiscointMissedProfitStddevFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_pop on columns */
+export interface BiscointMissedProfitStddevPopFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_samp on columns */
+export interface BiscointMissedProfitStddevSampFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate sum on columns */
+export interface BiscointMissedProfitSumFields {
+  quoteProfit?: Maybe<Scalars['numeric']>;
+}
+
+/** aggregate var_pop on columns */
+export interface BiscointMissedProfitVarPopFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate var_samp on columns */
+export interface BiscointMissedProfitVarSampFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate variance on columns */
+export interface BiscointMissedProfitVarianceFields {
+  quoteProfit?: Maybe<Scalars['Float']>;
+}
+
 /** columns and relationships of "biscoint.missed_trade" */
 export interface BiscointMissedTrade {
-  apiKeyId?: Maybe<Scalars['String']>;
   base?: Maybe<Scalars['String']>;
-  baseAmount?: Maybe<Scalars['String']>;
   checkedAt?: Maybe<Scalars['timestamptz']>;
-  createdAt?: Maybe<Scalars['timestamptz']>;
-  efPrice?: Maybe<Scalars['String']>;
-  expiresAt?: Maybe<Scalars['timestamptz']>;
   hasSiblings?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['Int']>;
-  isQuote?: Maybe<Scalars['Boolean']>;
-  offerId?: Maybe<Scalars['String']>;
-  op?: Maybe<Scalars['String']>;
   owner?: Maybe<Scalars['String']>;
-  quote?: Maybe<Scalars['String']>;
-  quoteAmount?: Maybe<Scalars['String']>;
+  quoteProfit?: Maybe<Scalars['numeric']>;
   status?: Maybe<Scalars['String']>;
   strategy?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
@@ -133,6 +226,7 @@ export interface BiscointMissedTradeAggregateFieldsCountArgs {
 /** aggregate avg on columns */
 export interface BiscointMissedTradeAvgFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** Boolean expression to filter rows from the table "biscoint.missed_trade". All fields are combined with a logical 'AND'. */
@@ -140,21 +234,12 @@ export interface BiscointMissedTradeBoolExp {
   _and?: InputMaybe<Array<BiscointMissedTradeBoolExp>>;
   _not?: InputMaybe<BiscointMissedTradeBoolExp>;
   _or?: InputMaybe<Array<BiscointMissedTradeBoolExp>>;
-  apiKeyId?: InputMaybe<StringComparisonExp>;
   base?: InputMaybe<StringComparisonExp>;
-  baseAmount?: InputMaybe<StringComparisonExp>;
   checkedAt?: InputMaybe<TimestamptzComparisonExp>;
-  createdAt?: InputMaybe<TimestamptzComparisonExp>;
-  efPrice?: InputMaybe<StringComparisonExp>;
-  expiresAt?: InputMaybe<TimestamptzComparisonExp>;
   hasSiblings?: InputMaybe<BooleanComparisonExp>;
   id?: InputMaybe<IntComparisonExp>;
-  isQuote?: InputMaybe<BooleanComparisonExp>;
-  offerId?: InputMaybe<StringComparisonExp>;
-  op?: InputMaybe<StringComparisonExp>;
   owner?: InputMaybe<StringComparisonExp>;
-  quote?: InputMaybe<StringComparisonExp>;
-  quoteAmount?: InputMaybe<StringComparisonExp>;
+  quoteProfit?: InputMaybe<NumericComparisonExp>;
   status?: InputMaybe<StringComparisonExp>;
   strategy?: InputMaybe<StringComparisonExp>;
   type?: InputMaybe<StringComparisonExp>;
@@ -162,19 +247,11 @@ export interface BiscointMissedTradeBoolExp {
 
 /** aggregate max on columns */
 export interface BiscointMissedTradeMaxFields {
-  apiKeyId?: Maybe<Scalars['String']>;
   base?: Maybe<Scalars['String']>;
-  baseAmount?: Maybe<Scalars['String']>;
   checkedAt?: Maybe<Scalars['timestamptz']>;
-  createdAt?: Maybe<Scalars['timestamptz']>;
-  efPrice?: Maybe<Scalars['String']>;
-  expiresAt?: Maybe<Scalars['timestamptz']>;
   id?: Maybe<Scalars['Int']>;
-  offerId?: Maybe<Scalars['String']>;
-  op?: Maybe<Scalars['String']>;
   owner?: Maybe<Scalars['String']>;
-  quote?: Maybe<Scalars['String']>;
-  quoteAmount?: Maybe<Scalars['String']>;
+  quoteProfit?: Maybe<Scalars['numeric']>;
   status?: Maybe<Scalars['String']>;
   strategy?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
@@ -182,19 +259,11 @@ export interface BiscointMissedTradeMaxFields {
 
 /** aggregate min on columns */
 export interface BiscointMissedTradeMinFields {
-  apiKeyId?: Maybe<Scalars['String']>;
   base?: Maybe<Scalars['String']>;
-  baseAmount?: Maybe<Scalars['String']>;
   checkedAt?: Maybe<Scalars['timestamptz']>;
-  createdAt?: Maybe<Scalars['timestamptz']>;
-  efPrice?: Maybe<Scalars['String']>;
-  expiresAt?: Maybe<Scalars['timestamptz']>;
   id?: Maybe<Scalars['Int']>;
-  offerId?: Maybe<Scalars['String']>;
-  op?: Maybe<Scalars['String']>;
   owner?: Maybe<Scalars['String']>;
-  quote?: Maybe<Scalars['String']>;
-  quoteAmount?: Maybe<Scalars['String']>;
+  quoteProfit?: Maybe<Scalars['numeric']>;
   status?: Maybe<Scalars['String']>;
   strategy?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
@@ -202,21 +271,12 @@ export interface BiscointMissedTradeMinFields {
 
 /** Ordering options when selecting data from "biscoint.missed_trade". */
 export interface BiscointMissedTradeOrderBy {
-  apiKeyId?: InputMaybe<OrderBy>;
   base?: InputMaybe<OrderBy>;
-  baseAmount?: InputMaybe<OrderBy>;
   checkedAt?: InputMaybe<OrderBy>;
-  createdAt?: InputMaybe<OrderBy>;
-  efPrice?: InputMaybe<OrderBy>;
-  expiresAt?: InputMaybe<OrderBy>;
   hasSiblings?: InputMaybe<OrderBy>;
   id?: InputMaybe<OrderBy>;
-  isQuote?: InputMaybe<OrderBy>;
-  offerId?: InputMaybe<OrderBy>;
-  op?: InputMaybe<OrderBy>;
   owner?: InputMaybe<OrderBy>;
-  quote?: InputMaybe<OrderBy>;
-  quoteAmount?: InputMaybe<OrderBy>;
+  quoteProfit?: InputMaybe<OrderBy>;
   status?: InputMaybe<OrderBy>;
   strategy?: InputMaybe<OrderBy>;
   type?: InputMaybe<OrderBy>;
@@ -225,35 +285,17 @@ export interface BiscointMissedTradeOrderBy {
 /** select columns of table "biscoint.missed_trade" */
 export enum BiscointMissedTradeSelectColumn {
   /** column name */
-  ApiKeyId = 'apiKeyId',
-  /** column name */
   Base = 'base',
   /** column name */
-  BaseAmount = 'baseAmount',
-  /** column name */
   CheckedAt = 'checkedAt',
-  /** column name */
-  CreatedAt = 'createdAt',
-  /** column name */
-  EfPrice = 'efPrice',
-  /** column name */
-  ExpiresAt = 'expiresAt',
   /** column name */
   HasSiblings = 'hasSiblings',
   /** column name */
   Id = 'id',
   /** column name */
-  IsQuote = 'isQuote',
-  /** column name */
-  OfferId = 'offerId',
-  /** column name */
-  Op = 'op',
-  /** column name */
   Owner = 'owner',
   /** column name */
-  Quote = 'quote',
-  /** column name */
-  QuoteAmount = 'quoteAmount',
+  QuoteProfit = 'quoteProfit',
   /** column name */
   Status = 'status',
   /** column name */
@@ -265,36 +307,43 @@ export enum BiscointMissedTradeSelectColumn {
 /** aggregate stddev on columns */
 export interface BiscointMissedTradeStddevFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** aggregate stddev_pop on columns */
 export interface BiscointMissedTradeStddevPopFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** aggregate stddev_samp on columns */
 export interface BiscointMissedTradeStddevSampFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** aggregate sum on columns */
 export interface BiscointMissedTradeSumFields {
   id?: Maybe<Scalars['Int']>;
+  quoteProfit?: Maybe<Scalars['numeric']>;
 }
 
 /** aggregate var_pop on columns */
 export interface BiscointMissedTradeVarPopFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** aggregate var_samp on columns */
 export interface BiscointMissedTradeVarSampFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** aggregate variance on columns */
 export interface BiscointMissedTradeVarianceFields {
   id?: Maybe<Scalars['Float']>;
+  quoteProfit?: Maybe<Scalars['Float']>;
 }
 
 /** columns and relationships of "biscoint.offer" */
@@ -1368,6 +1417,263 @@ export interface BiscointTradeVarianceFields {
   openOfferId?: Maybe<Scalars['Float']>;
 }
 
+/** columns and relationships of "biscoint.zombie_offer" */
+export interface BiscointZombieOffer {
+  anticipatedAmount?: Maybe<Scalars['String']>;
+  anticipationFeeQuote?: Maybe<Scalars['String']>;
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  confirmedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  isQuote?: Maybe<Scalars['Boolean']>;
+  nextRecycleAt?: Maybe<Scalars['timestamptz']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+}
+
+/** aggregated selection of "biscoint.zombie_offer" */
+export interface BiscointZombieOfferAggregate {
+  aggregate?: Maybe<BiscointZombieOfferAggregateFields>;
+  nodes: Array<BiscointZombieOffer>;
+}
+
+/** aggregate fields of "biscoint.zombie_offer" */
+export interface BiscointZombieOfferAggregateFields {
+  avg?: Maybe<BiscointZombieOfferAvgFields>;
+  count: Scalars['Int'];
+  max?: Maybe<BiscointZombieOfferMaxFields>;
+  min?: Maybe<BiscointZombieOfferMinFields>;
+  stddev?: Maybe<BiscointZombieOfferStddevFields>;
+  stddev_pop?: Maybe<BiscointZombieOfferStddevPopFields>;
+  stddev_samp?: Maybe<BiscointZombieOfferStddevSampFields>;
+  sum?: Maybe<BiscointZombieOfferSumFields>;
+  var_pop?: Maybe<BiscointZombieOfferVarPopFields>;
+  var_samp?: Maybe<BiscointZombieOfferVarSampFields>;
+  variance?: Maybe<BiscointZombieOfferVarianceFields>;
+}
+
+/** aggregate fields of "biscoint.zombie_offer" */
+export interface BiscointZombieOfferAggregateFieldsCountArgs {
+  columns?: InputMaybe<Array<BiscointZombieOfferSelectColumn>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+}
+
+/** aggregate avg on columns */
+export interface BiscointZombieOfferAvgFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** Boolean expression to filter rows from the table "biscoint.zombie_offer". All fields are combined with a logical 'AND'. */
+export interface BiscointZombieOfferBoolExp {
+  _and?: InputMaybe<Array<BiscointZombieOfferBoolExp>>;
+  _not?: InputMaybe<BiscointZombieOfferBoolExp>;
+  _or?: InputMaybe<Array<BiscointZombieOfferBoolExp>>;
+  anticipatedAmount?: InputMaybe<StringComparisonExp>;
+  anticipationFeeQuote?: InputMaybe<StringComparisonExp>;
+  apiKeyId?: InputMaybe<StringComparisonExp>;
+  base?: InputMaybe<StringComparisonExp>;
+  baseAmount?: InputMaybe<StringComparisonExp>;
+  confirmedAt?: InputMaybe<TimestamptzComparisonExp>;
+  createdAt?: InputMaybe<TimestamptzComparisonExp>;
+  efPrice?: InputMaybe<StringComparisonExp>;
+  expiresAt?: InputMaybe<TimestamptzComparisonExp>;
+  id?: InputMaybe<IntComparisonExp>;
+  isQuote?: InputMaybe<BooleanComparisonExp>;
+  nextRecycleAt?: InputMaybe<TimestamptzComparisonExp>;
+  offerId?: InputMaybe<StringComparisonExp>;
+  op?: InputMaybe<StringComparisonExp>;
+  quote?: InputMaybe<StringComparisonExp>;
+  quoteAmount?: InputMaybe<StringComparisonExp>;
+}
+
+/** input type for incrementing numeric columns in table "biscoint.zombie_offer" */
+export interface BiscointZombieOfferIncInput {
+  id?: InputMaybe<Scalars['Int']>;
+}
+
+/** input type for inserting data into table "biscoint.zombie_offer" */
+export interface BiscointZombieOfferInsertInput {
+  anticipatedAmount?: InputMaybe<Scalars['String']>;
+  anticipationFeeQuote?: InputMaybe<Scalars['String']>;
+  apiKeyId?: InputMaybe<Scalars['String']>;
+  base?: InputMaybe<Scalars['String']>;
+  baseAmount?: InputMaybe<Scalars['String']>;
+  confirmedAt?: InputMaybe<Scalars['timestamptz']>;
+  createdAt?: InputMaybe<Scalars['timestamptz']>;
+  efPrice?: InputMaybe<Scalars['String']>;
+  expiresAt?: InputMaybe<Scalars['timestamptz']>;
+  id?: InputMaybe<Scalars['Int']>;
+  isQuote?: InputMaybe<Scalars['Boolean']>;
+  nextRecycleAt?: InputMaybe<Scalars['timestamptz']>;
+  offerId?: InputMaybe<Scalars['String']>;
+  op?: InputMaybe<Scalars['String']>;
+  quote?: InputMaybe<Scalars['String']>;
+  quoteAmount?: InputMaybe<Scalars['String']>;
+}
+
+/** aggregate max on columns */
+export interface BiscointZombieOfferMaxFields {
+  anticipatedAmount?: Maybe<Scalars['String']>;
+  anticipationFeeQuote?: Maybe<Scalars['String']>;
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  confirmedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  nextRecycleAt?: Maybe<Scalars['timestamptz']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+}
+
+/** aggregate min on columns */
+export interface BiscointZombieOfferMinFields {
+  anticipatedAmount?: Maybe<Scalars['String']>;
+  anticipationFeeQuote?: Maybe<Scalars['String']>;
+  apiKeyId?: Maybe<Scalars['String']>;
+  base?: Maybe<Scalars['String']>;
+  baseAmount?: Maybe<Scalars['String']>;
+  confirmedAt?: Maybe<Scalars['timestamptz']>;
+  createdAt?: Maybe<Scalars['timestamptz']>;
+  efPrice?: Maybe<Scalars['String']>;
+  expiresAt?: Maybe<Scalars['timestamptz']>;
+  id?: Maybe<Scalars['Int']>;
+  nextRecycleAt?: Maybe<Scalars['timestamptz']>;
+  offerId?: Maybe<Scalars['String']>;
+  op?: Maybe<Scalars['String']>;
+  quote?: Maybe<Scalars['String']>;
+  quoteAmount?: Maybe<Scalars['String']>;
+}
+
+/** response of any mutation on the table "biscoint.zombie_offer" */
+export interface BiscointZombieOfferMutationResponse {
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int'];
+  /** data from the rows affected by the mutation */
+  returning: Array<BiscointZombieOffer>;
+}
+
+/** Ordering options when selecting data from "biscoint.zombie_offer". */
+export interface BiscointZombieOfferOrderBy {
+  anticipatedAmount?: InputMaybe<OrderBy>;
+  anticipationFeeQuote?: InputMaybe<OrderBy>;
+  apiKeyId?: InputMaybe<OrderBy>;
+  base?: InputMaybe<OrderBy>;
+  baseAmount?: InputMaybe<OrderBy>;
+  confirmedAt?: InputMaybe<OrderBy>;
+  createdAt?: InputMaybe<OrderBy>;
+  efPrice?: InputMaybe<OrderBy>;
+  expiresAt?: InputMaybe<OrderBy>;
+  id?: InputMaybe<OrderBy>;
+  isQuote?: InputMaybe<OrderBy>;
+  nextRecycleAt?: InputMaybe<OrderBy>;
+  offerId?: InputMaybe<OrderBy>;
+  op?: InputMaybe<OrderBy>;
+  quote?: InputMaybe<OrderBy>;
+  quoteAmount?: InputMaybe<OrderBy>;
+}
+
+/** select columns of table "biscoint.zombie_offer" */
+export enum BiscointZombieOfferSelectColumn {
+  /** column name */
+  AnticipatedAmount = 'anticipatedAmount',
+  /** column name */
+  AnticipationFeeQuote = 'anticipationFeeQuote',
+  /** column name */
+  ApiKeyId = 'apiKeyId',
+  /** column name */
+  Base = 'base',
+  /** column name */
+  BaseAmount = 'baseAmount',
+  /** column name */
+  ConfirmedAt = 'confirmedAt',
+  /** column name */
+  CreatedAt = 'createdAt',
+  /** column name */
+  EfPrice = 'efPrice',
+  /** column name */
+  ExpiresAt = 'expiresAt',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsQuote = 'isQuote',
+  /** column name */
+  NextRecycleAt = 'nextRecycleAt',
+  /** column name */
+  OfferId = 'offerId',
+  /** column name */
+  Op = 'op',
+  /** column name */
+  Quote = 'quote',
+  /** column name */
+  QuoteAmount = 'quoteAmount',
+}
+
+/** input type for updating data in table "biscoint.zombie_offer" */
+export interface BiscointZombieOfferSetInput {
+  anticipatedAmount?: InputMaybe<Scalars['String']>;
+  anticipationFeeQuote?: InputMaybe<Scalars['String']>;
+  apiKeyId?: InputMaybe<Scalars['String']>;
+  base?: InputMaybe<Scalars['String']>;
+  baseAmount?: InputMaybe<Scalars['String']>;
+  confirmedAt?: InputMaybe<Scalars['timestamptz']>;
+  createdAt?: InputMaybe<Scalars['timestamptz']>;
+  efPrice?: InputMaybe<Scalars['String']>;
+  expiresAt?: InputMaybe<Scalars['timestamptz']>;
+  id?: InputMaybe<Scalars['Int']>;
+  isQuote?: InputMaybe<Scalars['Boolean']>;
+  nextRecycleAt?: InputMaybe<Scalars['timestamptz']>;
+  offerId?: InputMaybe<Scalars['String']>;
+  op?: InputMaybe<Scalars['String']>;
+  quote?: InputMaybe<Scalars['String']>;
+  quoteAmount?: InputMaybe<Scalars['String']>;
+}
+
+/** aggregate stddev on columns */
+export interface BiscointZombieOfferStddevFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_pop on columns */
+export interface BiscointZombieOfferStddevPopFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate stddev_samp on columns */
+export interface BiscointZombieOfferStddevSampFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate sum on columns */
+export interface BiscointZombieOfferSumFields {
+  id?: Maybe<Scalars['Int']>;
+}
+
+/** aggregate var_pop on columns */
+export interface BiscointZombieOfferVarPopFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate var_samp on columns */
+export interface BiscointZombieOfferVarSampFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
+/** aggregate variance on columns */
+export interface BiscointZombieOfferVarianceFields {
+  id?: Maybe<Scalars['Float']>;
+}
+
 /** mutation root */
 export interface MutationRoot {
   /** delete data from the table: "biscoint.offer" */
@@ -1382,6 +1688,8 @@ export interface MutationRoot {
   delete_biscoint_trade?: Maybe<BiscointTradeMutationResponse>;
   /** delete single row from the table: "biscoint.trade" */
   delete_biscoint_trade_by_pk?: Maybe<BiscointTrade>;
+  /** delete data from the table: "biscoint.zombie_offer" */
+  delete_biscoint_zombie_offer?: Maybe<BiscointZombieOfferMutationResponse>;
   /** insert data into the table: "biscoint.offer" */
   insert_biscoint_offer?: Maybe<BiscointOfferMutationResponse>;
   /** insert a single row into the table: "biscoint.offer" */
@@ -1394,6 +1702,10 @@ export interface MutationRoot {
   insert_biscoint_trade?: Maybe<BiscointTradeMutationResponse>;
   /** insert a single row into the table: "biscoint.trade" */
   insert_biscoint_trade_one?: Maybe<BiscointTrade>;
+  /** insert data into the table: "biscoint.zombie_offer" */
+  insert_biscoint_zombie_offer?: Maybe<BiscointZombieOfferMutationResponse>;
+  /** insert a single row into the table: "biscoint.zombie_offer" */
+  insert_biscoint_zombie_offer_one?: Maybe<BiscointZombieOffer>;
   /** update data of the table: "biscoint.offer" */
   update_biscoint_offer?: Maybe<BiscointOfferMutationResponse>;
   /** update single row of the table: "biscoint.offer" */
@@ -1406,6 +1718,8 @@ export interface MutationRoot {
   update_biscoint_trade?: Maybe<BiscointTradeMutationResponse>;
   /** update single row of the table: "biscoint.trade" */
   update_biscoint_trade_by_pk?: Maybe<BiscointTrade>;
+  /** update data of the table: "biscoint.zombie_offer" */
+  update_biscoint_zombie_offer?: Maybe<BiscointZombieOfferMutationResponse>;
 }
 
 /** mutation root */
@@ -1436,6 +1750,11 @@ export interface MutationRootDeleteBiscointTradeArgs {
 /** mutation root */
 export interface MutationRootDeleteBiscointTradeByPkArgs {
   id: Scalars['Int'];
+}
+
+/** mutation root */
+export interface MutationRootDeleteBiscointZombieOfferArgs {
+  where: BiscointZombieOfferBoolExp;
 }
 
 /** mutation root */
@@ -1472,6 +1791,16 @@ export interface MutationRootInsertBiscointTradeArgs {
 export interface MutationRootInsertBiscointTradeOneArgs {
   object: BiscointTradeInsertInput;
   on_conflict?: InputMaybe<BiscointTradeOnConflict>;
+}
+
+/** mutation root */
+export interface MutationRootInsertBiscointZombieOfferArgs {
+  objects: Array<BiscointZombieOfferInsertInput>;
+}
+
+/** mutation root */
+export interface MutationRootInsertBiscointZombieOfferOneArgs {
+  object: BiscointZombieOfferInsertInput;
 }
 
 /** mutation root */
@@ -1516,6 +1845,26 @@ export interface MutationRootUpdateBiscointTradeByPkArgs {
   pk_columns: BiscointTradePkColumnsInput;
 }
 
+/** mutation root */
+export interface MutationRootUpdateBiscointZombieOfferArgs {
+  _inc?: InputMaybe<BiscointZombieOfferIncInput>;
+  _set?: InputMaybe<BiscointZombieOfferSetInput>;
+  where: BiscointZombieOfferBoolExp;
+}
+
+/** Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'. */
+export interface NumericComparisonExp {
+  _eq?: InputMaybe<Scalars['numeric']>;
+  _gt?: InputMaybe<Scalars['numeric']>;
+  _gte?: InputMaybe<Scalars['numeric']>;
+  _in?: InputMaybe<Array<Scalars['numeric']>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _lt?: InputMaybe<Scalars['numeric']>;
+  _lte?: InputMaybe<Scalars['numeric']>;
+  _neq?: InputMaybe<Scalars['numeric']>;
+  _nin?: InputMaybe<Array<Scalars['numeric']>>;
+}
+
 /** column ordering options */
 export enum OrderBy {
   /** in ascending order, nulls last */
@@ -1533,6 +1882,10 @@ export enum OrderBy {
 }
 
 export interface QueryRoot {
+  /** fetch data from the table: "biscoint.missed_profit" */
+  biscoint_missed_profit: Array<BiscointMissedProfit>;
+  /** fetch aggregated fields from the table: "biscoint.missed_profit" */
+  biscoint_missed_profit_aggregate: BiscointMissedProfitAggregate;
   /** fetch data from the table: "biscoint.missed_trade" */
   biscoint_missed_trade: Array<BiscointMissedTrade>;
   /** fetch aggregated fields from the table: "biscoint.missed_trade" */
@@ -1559,6 +1912,26 @@ export interface QueryRoot {
   biscoint_trade_aggregate: BiscointTradeAggregate;
   /** fetch data from the table: "biscoint.trade" using primary key columns */
   biscoint_trade_by_pk?: Maybe<BiscointTrade>;
+  /** fetch data from the table: "biscoint.zombie_offer" */
+  biscoint_zombie_offer: Array<BiscointZombieOffer>;
+  /** fetch aggregated fields from the table: "biscoint.zombie_offer" */
+  biscoint_zombie_offer_aggregate: BiscointZombieOfferAggregate;
+}
+
+export interface QueryRootBiscointMissedProfitArgs {
+  distinct_on?: InputMaybe<Array<BiscointMissedProfitSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointMissedProfitOrderBy>>;
+  where?: InputMaybe<BiscointMissedProfitBoolExp>;
+}
+
+export interface QueryRootBiscointMissedProfitAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointMissedProfitSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointMissedProfitOrderBy>>;
+  where?: InputMaybe<BiscointMissedProfitBoolExp>;
 }
 
 export interface QueryRootBiscointMissedTradeArgs {
@@ -1653,7 +2026,27 @@ export interface QueryRootBiscointTradeByPkArgs {
   id: Scalars['Int'];
 }
 
+export interface QueryRootBiscointZombieOfferArgs {
+  distinct_on?: InputMaybe<Array<BiscointZombieOfferSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointZombieOfferOrderBy>>;
+  where?: InputMaybe<BiscointZombieOfferBoolExp>;
+}
+
+export interface QueryRootBiscointZombieOfferAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointZombieOfferSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointZombieOfferOrderBy>>;
+  where?: InputMaybe<BiscointZombieOfferBoolExp>;
+}
+
 export interface SubscriptionRoot {
+  /** fetch data from the table: "biscoint.missed_profit" */
+  biscoint_missed_profit: Array<BiscointMissedProfit>;
+  /** fetch aggregated fields from the table: "biscoint.missed_profit" */
+  biscoint_missed_profit_aggregate: BiscointMissedProfitAggregate;
   /** fetch data from the table: "biscoint.missed_trade" */
   biscoint_missed_trade: Array<BiscointMissedTrade>;
   /** fetch aggregated fields from the table: "biscoint.missed_trade" */
@@ -1680,6 +2073,26 @@ export interface SubscriptionRoot {
   biscoint_trade_aggregate: BiscointTradeAggregate;
   /** fetch data from the table: "biscoint.trade" using primary key columns */
   biscoint_trade_by_pk?: Maybe<BiscointTrade>;
+  /** fetch data from the table: "biscoint.zombie_offer" */
+  biscoint_zombie_offer: Array<BiscointZombieOffer>;
+  /** fetch aggregated fields from the table: "biscoint.zombie_offer" */
+  biscoint_zombie_offer_aggregate: BiscointZombieOfferAggregate;
+}
+
+export interface SubscriptionRootBiscointMissedProfitArgs {
+  distinct_on?: InputMaybe<Array<BiscointMissedProfitSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointMissedProfitOrderBy>>;
+  where?: InputMaybe<BiscointMissedProfitBoolExp>;
+}
+
+export interface SubscriptionRootBiscointMissedProfitAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointMissedProfitSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointMissedProfitOrderBy>>;
+  where?: InputMaybe<BiscointMissedProfitBoolExp>;
 }
 
 export interface SubscriptionRootBiscointMissedTradeArgs {
@@ -1774,6 +2187,22 @@ export interface SubscriptionRootBiscointTradeByPkArgs {
   id: Scalars['Int'];
 }
 
+export interface SubscriptionRootBiscointZombieOfferArgs {
+  distinct_on?: InputMaybe<Array<BiscointZombieOfferSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointZombieOfferOrderBy>>;
+  where?: InputMaybe<BiscointZombieOfferBoolExp>;
+}
+
+export interface SubscriptionRootBiscointZombieOfferAggregateArgs {
+  distinct_on?: InputMaybe<Array<BiscointZombieOfferSelectColumn>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<BiscointZombieOfferOrderBy>>;
+  where?: InputMaybe<BiscointZombieOfferBoolExp>;
+}
+
 /** Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'. */
 export interface TimestamptzComparisonExp {
   _eq?: InputMaybe<Scalars['timestamptz']>;
@@ -1864,6 +2293,7 @@ export type UpdateTradeMutationVariables = Exact<{
   checkedAt?: InputMaybe<Scalars['timestamptz']>;
   status?: InputMaybe<Scalars['String']>;
   hasSiblings?: InputMaybe<Scalars['Boolean']>;
+  closeOfferId?: InputMaybe<Scalars['Int']>;
 }>;
 
 export type UpdateTradeMutation = {
@@ -1957,6 +2387,7 @@ export const UpdateTradeDocument = gql`
     $checkedAt: timestamptz
     $status: String
     $hasSiblings: Boolean
+    $closeOfferId: Int
   ) {
     update_biscoint_trade_by_pk(
       pk_columns: { id: $id }
@@ -1964,6 +2395,7 @@ export const UpdateTradeDocument = gql`
         checkedAt: $checkedAt
         status: $status
         hasSiblings: $hasSiblings
+        closeOfferId: $closeOfferId
       }
     ) {
       id

@@ -92,8 +92,10 @@ export class CheckService {
           !closeOffer &&
           this.isExpired(trade.closeOffer, this.config.app.expireAfter);
         if (isBrokenTrade) {
+          if (trade.status !== 'broken')
+            this.notify(trade, TradeEvent.TRADE_BROKEN);
+
           trade.status = 'broken';
-          this.notify(trade, TradeEvent.TRADE_BROKEN);
         }
 
         const isClosedTrade = openOffer && closeOffer;
